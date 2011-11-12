@@ -18,10 +18,9 @@
 #GNU General Public License for more details.
 
 #You should have received a copy of the GNU General Public License
-#along with this program; if not, write to the Free Software
-#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#along with this program. If not, see <http://www.gnu.org/licenses/>
 
-import urllib, urllib2, sys, argparse
+import urllib, urllib2, sys, argparse, time
 
 def reporthook(a,b,c):
     print "% 3.1f%% of %d bytes\r" % (min(100, float(a * b) / c * 100), c),
@@ -35,7 +34,7 @@ def extension(val):
     else:
        return 'pdf'
 
-arguments = argparse.ArgumentParser(description='Scans a page from a JetDirect device')
+arguments = argparse.ArgumentParser(prog=jetscanner, description='Scans a page from a JetDirect device')
 arguments.add_argument('--dev', '-d', help='HP JetDirect device, either IP address or hostname', required=True)
 arguments.add_argument('--id', '-i', help='unknown either 10 or 11', required=True, type=int)
 arguments.add_argument('--type', '-t', help='Image type, 4=Color Picture 3=Color Drawing 2=B/W Picture 1=Text', required=True, type=int)
@@ -43,7 +42,7 @@ arguments.add_argument('--size', '-s', help='Document size, 1=Letter, 4=Executiv
 arguments.add_argument('--fmt', '-f', help='File format, 1=TIFF 2=JPEG 3=PDF', required=True, type=int)
 args = arguments.parse_args()
 
-time = '13121062504534'
+time = int(time.time() * 1000) # the POST string requires a 13 char epoch time string
 
 dev = args.dev
 id = args.id
