@@ -24,6 +24,7 @@ import urllib, urllib2, sys, argparse, time
 from pyPdf import PdfFileWriter, PdfFileReader
 
 localfile = 'none'
+multipage = 'mpdf' + time.strftime('%Y%m%d%H%M%S') + '.pdf'
 
 def reporthook(a,b,c):
     print "% 3.1f%% of %d bytes\r" % (min(100, float(a * b) / c * 100), c),
@@ -55,6 +56,13 @@ def curfilename():
     localfile = 'scanned' + filetime + '.' + extension(args.fmt)
     return(localfile)
 
+def scanpage():
+    url = 'http://' + args.dev + '/scan/image1.' + extension(args.fmt)
+    parameters = {'id' : 10, 'type' : args.type, 'size' : args.size, 'fmt' : args.fmt, 'time' : posttime}
+    pass_values = urllib.urlencode(parameters)
+    sendreq = url + '?' + pass_values
+    urllib.urlretrieve(sendreq, curfilename(), reporthook)
+
 arguments = argparse.ArgumentParser(prog='jetscanner', description='Scans a page from a JetDirect device')
 arguments.add_argument('--dev', '-d', help='HP JetDirect device, either IP address or hostname', required=True)
 arguments.add_argument('--type', '-t', help='Image type, 4=Color Picture 3=Color Drawing 2=B/W Picture 1=Text', required=True, type=int, choices=[4, 3, 2, 1])
@@ -70,22 +78,17 @@ if args.fmt == 2:
       print 'JPEG scanning is not supported with B/W or Text types'
       quit()
 
-def scanpage():
-    url = 'http://' + args.dev + '/scan/image1.' + extension(args.fmt)
-    parameters = {'id' : 10, 'type' : args.type, 'size' : args.size, 'fmt' : args.fmt, 'time' : posttime}
-    pass_values = urllib.urlencode(parameters)
-    sendreq = url + '?' + pass_values
-    urllib.urlretrieve(sendreq, curfilename(), reporthook)
-
 scanpage()
 
 if args.fmt == 3 and args.mp == True:
    out = PdfFileWriter()
-   outstream = file('out.pdf', "wb")
+   outstream = file(multipage, "wb")
+   inp = PdfFileReader(file(localfile, "rb"))
+   out.addPage(inp.getPage(0))
    while askyesno() == True:
+      scanpage()
       inp = PdfFileReader(file(localfile, "rb"))
       out.addPage(inp.getPage(0))
-      scanpage()
    out.write(outstream)
    outstream.close()
    quit()
