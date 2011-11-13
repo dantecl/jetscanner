@@ -23,8 +23,6 @@
 import urllib, urllib2, sys, argparse, time
 from pyPdf import PdfFileWriter, PdfFileReader
 
-#import pdb
-
 localfile = 'none'
 
 def reporthook(a,b,c):
@@ -78,46 +76,16 @@ def scanpage():
     pass_values = urllib.urlencode(parameters)
     sendreq = url + '?' + pass_values
     urllib.urlretrieve(sendreq, curfilename(), reporthook)
-    #return ('scanned')
 
-#pdb.set_trace()
-
-print 'We are scanning the first page'
 scanpage()
 
 if args.fmt == 3 and args.mp == True:
-   #onemore = ''
    out = PdfFileWriter()
    outstream = file('out.pdf', "wb")
    while askyesno() == True:
-      print 'answered yes so we are scanning again'
       inp = PdfFileReader(file(localfile, "rb"))
-      print 'read the file'
       out.addPage(inp.getPage(0))
-      print 'at this point we added the first page to the output'
       scanpage()
    out.write(outstream)
    outstream.close()
    quit()
-
-
-#   while onemore != False:
-#         print 'we entered the while'
-#         scanpage()
-#         if askyesno() == True:
-#            inp = PdfFileReader(file(localfile, "rb"))
-#            print 'you said yes, sending the next scan command'
-#            out.addPage(inp.getPage(0))
-#            print 'added the previous file,' + localfile + ' to the out file'
-#            #scanpage()
-#            #onemore = True
-#         else:
-#              print 'answered no'
-#              onemore == False
-#              break
-#         outStream = file("out.pdf", "wb")
-#         out.write(outStream)
-#         outStream.close()
-#         quit()
-
-
